@@ -2,6 +2,10 @@
 
 A full-stack credit-risk assessment demonstration built with **FastAPI**, **scikit-learn**, **XGBoost**, and a responsive HTML/CSS/JavaScript interface. It uses a calibrated classification pipeline trained on the included credit-risk dataset to estimate the probability of a recorded loan default.
 
+**🔗 Live demo:** [https://credit-risk-assessment-k9ph.onrender.com/](https://credit-risk-assessment-k9ph.onrender.com/)
+
+> **Note:** The demo is hosted on Render's free tier, which sleeps when unused. The first request after a break can take up to a minute to respond.
+
 > **Responsible-use note:** This is an educational portfolio project. Its output is not a credit decision, financial advice, or a guarantee of repayment. It must not be used as the sole basis for real lending decisions.
 
 ## Features
@@ -33,6 +37,7 @@ The result card shows the default chance, the repayment chance, and where the ap
 | Data              | Pandas, NumPy             |
 | Model persistence | joblib, pickle            |
 | API testing       | pytest, HTTPX             |
+| Hosting           | Render                    |
 
 ## Project structure
 
@@ -96,7 +101,20 @@ pytest -q
 
 The tests check the input validation and call the real `/health` and `/predict` endpoints with the saved model. You may see a warning from XGBoost about the model file version. It is only a notice and does not affect the results.
 
-## Deploy on Render
+## Deployment
+
+The app is deployed on Render and available at:
+
+**[https://credit-risk-assessment-k9ph.onrender.com/](https://credit-risk-assessment-k9ph.onrender.com/)**
+
+| Page / endpoint | URL |
+| --------------- | --- |
+| Application | https://credit-risk-assessment-k9ph.onrender.com/ |
+| Interactive API docs | https://credit-risk-assessment-k9ph.onrender.com/docs |
+| Health check | https://credit-risk-assessment-k9ph.onrender.com/health |
+| Model info | https://credit-risk-assessment-k9ph.onrender.com/model-info |
+
+### Deploy your own copy on Render
 
 The FastAPI app serves both the website and the API, so only **one** Render web service is needed.
 
@@ -108,6 +126,8 @@ The FastAPI app serves both the website and the API, so only **one** Render web 
 Render's free tier goes to sleep when unused, so the first request after a break can take up to a minute.
 
 ## API
+
+The API is available locally at `http://127.0.0.1:8000` and in the deployed demo at `https://credit-risk-assessment-k9ph.onrender.com`.
 
 ### `GET /health`
 
@@ -135,6 +155,26 @@ Example request:
   "cb_person_default_on_file": "N",
   "cb_person_cred_hist_length": 5
 }
+```
+
+Example call against the deployed demo:
+
+```bash
+curl -X POST https://credit-risk-assessment-k9ph.onrender.com/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "person_age": 30,
+    "person_income": 60000,
+    "person_home_ownership": "RENT",
+    "person_emp_length": 5,
+    "loan_intent": "PERSONAL",
+    "loan_grade": "A",
+    "loan_amnt": 10000,
+    "loan_int_rate": 11.5,
+    "loan_percent_income": 0.1667,
+    "cb_person_default_on_file": "N",
+    "cb_person_cred_hist_length": 5
+  }'
 ```
 
 The `loan_percent_income` value should be the loan amount divided by annual income. The browser form calculates this field automatically.
