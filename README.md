@@ -181,4 +181,3 @@ The interface shows global feature importance aggregated across available calibr
 - Add individual-level explanations with a verified SHAP implementation.
 - Add authentication and audit logging if the application is extended beyond a local demo.
 - Add CI checks and deployment configuration after verifying the target hosting platform.
-# Credit-Risk-Assessment
