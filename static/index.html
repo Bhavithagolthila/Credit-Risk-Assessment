@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f3f6fb" />
+  <meta name="description" content="Credit Ledger — an explainable credit risk assessment demonstration." />
+  <title>Credit Ledger — Credit Risk Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <a class="skip" href="#assessment">Skip to the form</a>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Credit Ledger home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="brand-name">Credit Ledger</span>
+      </a>
+      <nav class="topbar-right" aria-label="Page">
+        <span class="service-status"><span class="status-dot" id="statusDot"></span><span id="serviceStatus">Checking service</span></span>
+        <a class="text-link" href="#methodology">About the model</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="intro">
+        <h1>How risky is<br />this loan request?</h1>
+        <p class="intro-copy">Fill in the applicant and loan details. A trained machine-learning model estimates the chance that this loan ends in default, and shows where that sits against its decision line.</p>
+      </section>
+
+      <div class="workspace" id="assessment">
+        <section class="form-panel" aria-labelledby="formTitle">
+          <div class="panel-heading">
+            <h2 id="formTitle">Applicant profile</h2>
+            <span class="required-note"><b>*</b> required</span>
+          </div>
+          <form id="assessmentForm" novalidate>
+            <fieldset class="form-section tone-blue">
+              <legend><span class="legend-chip">Applicant</span><span class="legend-sub">Who is applying</span></legend>
+              <div class="field-grid">
+                <label class="field"><span>Age <b>*</b></span><div class="input-wrap"><input name="person_age" type="number" min="18" max="100" value="30" required /><small>years</small></div></label>
+                <label class="field"><span>Annual income <b>*</b></span><div class="input-wrap"><span class="prefix">$</span><input name="person_income" type="number" min="1" max="6000000" value="60000" required /></div></label>
+                <label class="field"><span>Home ownership <b>*</b></span><select name="person_home_ownership" required><option value="RENT">Renting</option><option value="MORTGAGE">Mortgage</option><option value="OWN">Own</option><option value="OTHER">Other</option></select></label>
+                <label class="field"><span>Employment length <b>*</b></span><div class="input-wrap"><input name="person_emp_length" type="number" min="0" max="60" step="0.5" value="5" required /><small>years</small></div></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section tone-violet">
+              <legend><span class="legend-chip">Loan request</span><span class="legend-sub">What they want to borrow</span></legend>
+              <div class="field-grid">
+                <label class="field"><span>Loan purpose <b>*</b></span><select name="loan_intent" required><option value="PERSONAL">Personal</option><option value="EDUCATION">Education</option><option value="MEDICAL">Medical</option><option value="VENTURE">Business venture</option><option value="HOMEIMPROVEMENT">Home improvement</option><option value="DEBTCONSOLIDATION">Debt consolidation</option></select></label>
+                <label class="field"><span>Loan grade <b>*</b></span><select name="loan_grade" required><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option></select></label>
+                <label class="field wide"><span>Loan amount <b>*</b></span>
+                  <div class="input-wrap"><span class="prefix">$</span><input name="loan_amnt" id="loanAmount" type="number" min="500" max="35000" step="100" value="10000" required /></div>
+                  <input class="slider" id="loanSlider" type="range" min="500" max="35000" step="100" value="10000" aria-label="Loan amount slider" />
+                </label>
+                <label class="field"><span>Interest rate <b>*</b></span><div class="input-wrap"><input name="loan_int_rate" type="number" min="5.42" max="23.22" step="0.01" value="11.5" required /><small>%</small></div></label>
+                <label class="field"><span>Loan as share of income</span><div class="input-wrap calc"><input name="loan_percent_income" id="loanRatio" type="number" value="0.17" readonly /><small>ratio</small></div><small class="field-hint">Worked out for you: loan amount ÷ annual income.</small></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-section tone-teal">
+              <legend><span class="legend-chip">Credit history</span><span class="legend-sub">Past borrowing behaviour</span></legend>
+              <div class="field-grid">
+                <label class="field"><span>Previous default on file <b>*</b></span><select name="cb_person_default_on_file" required><option value="N">No</option><option value="Y">Yes</option></select></label>
+                <label class="field"><span>Credit history length <b>*</b></span><div class="input-wrap"><input name="cb_person_cred_hist_length" type="number" min="2" max="30" value="5" required /><small>years</small></div></label>
+              </div>
+            </fieldset>
+
+            <div class="form-actions">
+              <p>Your values are used for this assessment only.</p>
+              <button type="submit" id="submitButton"><span>Check risk</span></button>
+            </div>
+            <p class="form-error" id="formError" role="alert" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <aside class="results-column">
+          <section class="result-panel" id="resultPanel" aria-live="polite">
+            <div class="empty-result" id="emptyResult">
+              <svg class="empty-art" viewBox="0 0 220 60" aria-hidden="true"><defs><linearGradient id="eg" x1="0" x2="1"><stop offset="0" stop-color="#19a58a"/><stop offset=".55" stop-color="#f2b134"/><stop offset="1" stop-color="#ef5b5b"/></linearGradient></defs><rect x="4" y="26" width="212" height="10" rx="5" fill="url(#eg)" opacity=".35"/><line x1="140" y1="14" x2="140" y2="48" stroke="#1d2150" stroke-width="2" stroke-dasharray="3 3"/></svg>
+              <h2>Your result will appear here</h2>
+              <p>Fill in the form and press <b>Check risk</b>. You will see the default chance on a risk scale.</p>
+            </div>
+
+            <div class="result-content hidden" id="resultContent">
+              <span class="verdict" id="verdictPill"><i></i><span id="riskTitle">Lower risk</span></span>
+              <div class="big-number"><strong id="defaultProbability">—</strong><span>chance of default</span></div>
+              <p class="result-description" id="riskDescription"></p>
+
+              <div class="spectrum" aria-hidden="true">
+                <div class="spectrum-bar"></div>
+                <i class="spectrum-threshold" id="thresholdMarker"></i>
+                <span class="spectrum-pin" id="probabilityFill"></span>
+              </div>
+              <div class="scale-labels"><span>0%</span><span>Decision line <b id="thresholdValue">—</b></span><span>100%</span></div>
+
+              <div class="result-stats">
+                <div><span>Chance of repayment</span><strong id="repaymentProbability">—</strong></div>
+                <div><span>Model decision line</span><strong id="thresholdStat">—</strong></div>
+              </div>
+              <div class="result-disclaimer" id="resultDisclaimer"></div>
+              <button type="button" class="reset-button" id="resetButton">Clear and start again</button>
+            </div>
+          </section>
+
+          <section class="insight-panel">
+            <h3>What the model looks at</h3>
+            <p>Overall importance of each detail across all training data. It does not explain this one applicant.</p>
+            <div id="importanceList" class="importance-list"><span class="loading-line">Loading model information…</span></div>
+          </section>
+        </aside>
+      </div>
+
+      <section class="methodology" id="methodology">
+        <h2>A guide, not a verdict.</h2>
+        <div class="method-copy"><p>Credit Ledger is a learning project built around a calibrated XGBoost classifier. It estimates how likely a recorded loan default is, based on the details you enter.</p><p>The result is not a lending decision and does not prove anyone is creditworthy. Training data can carry historical bias, so never use it as the only basis for a real financial decision.</p></div>
+      </section>
+    </main>
+
+    <footer class="footer"><a class="footer-brand" href="#top">Credit Ledger</a><a href="/docs" target="_blank" rel="noreferrer">API documentation</a></footer>
+  </div>
+  <script src="/script.js" defer></script>
+</body>
+</html>
